@@ -1,0 +1,9 @@
+export interface ApiConfig {
+  basePath: string;
+  pid?: string;
+  authHeaderGetter: (method: string, uri: string, body: any) => string;
+}
+
+export interface ApiConfigMap {
+  [key: string]: ApiConfig;
+}
