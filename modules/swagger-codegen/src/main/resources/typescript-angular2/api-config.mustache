@@ -4,6 +4,6 @@ export interface ApiConfig {
   authHeaderGetter: (method: string, uri: string, body: any) => string;
 }
 
-export interface ApiConfigMap {
-  [key: string]: ApiConfig;
+export interface Api{{appName}}ConfigMap {
+  {{appName}}: ApiConfig;
 }

@@ -1,11 +1,10 @@
 {{>licenseInfo}}
-import {Http, Headers, RequestOptionsArgs, Response, URLSearchParams} from '@angular/http';
-import {Injectable, Optional} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import { Http, Headers, RequestOptionsArgs, Response, URLSearchParams } from '@angular/http';
+import { Injectable, Inject } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import * as models from '../model/models';
 import 'rxjs/add/operator/map';
-import * as _ from 'lodash';
-import { ApiConfig, ApiConfigMap } from './api-config';
+import { ApiConfig, Api{{appName}}ConfigMap } from './api-config';
 
 /* tslint:disable:no-unused-variable member-ordering */
 
@@ -19,80 +18,87 @@ import { ApiConfig, ApiConfigMap } from './api-config';
 {{/description}}
 @Injectable()
 export class {{classname}} {
-    public headers : Headers = new Headers();
-    private config: ApiConfig;
+  public defaultHeaders : Headers = new Headers();
+  private config: ApiConfig;
 
-    constructor(protected http: Http, protected apiConfig: ApiConfigMap) {
-      const apiName = _.startCase('{{appName}}');
-      this.config = <ApiConfig>_.get(apiConfig, apiName);
+  constructor(protected http: Http, @Inject('API_CONFIG') apiConfig: Api{{appName}}ConfigMap) {
+    this.config = <ApiConfig>apiConfig.{{appName}};
+    if (!this.config) {
+      throw new Error('No Config Provider for {{appName}}');
     }
+  }
 
 {{#operation}}
-    /**
-     * {{summary}}
-     * {{notes}}
-     {{#allParams}}* @param {{paramName}} {{description}}
-     {{/allParams}}*/
-    public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any ) : Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}> {
-        const path = this.config.basePath + '{{path}}'{{#pathParams}}
-            .replace('{' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
+  /**
+   * {{summary}}
+   {{#notes}}*{{ notes}}{{/notes}}
+   {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
+   {{/allParams}}*/
+  public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any ) : Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}> {
+    const path = this.config.basePath + '{{path}}'{{#pathParams}}
+      .replace('{' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
 
-        let queryParameters = new URLSearchParams();
-        let headerParams = this.headers;
+    let queryParameters = new URLSearchParams();
+    let headerParams = this.defaultHeaders;
 {{#hasFormParams}}
-        let formParams = new URLSearchParams();
+    let formParams = new URLSearchParams();
 {{/hasFormParams}}
 {{#allParams}}
 {{#required}}
-        // verify required parameter '{{paramName}}' is not null or undefined
-        if ({{paramName}} === null || {{paramName}} === undefined) {
-            throw new Error('Required parameter {{paramName}} was null or undefined when calling {{nickname}}.');
-        }
+    // verify required parameter '{{paramName}}' is not null or undefined
+    if ({{paramName}} === null || {{paramName}} === undefined) {
+      throw new Error('Required parameter {{paramName}} was null or undefined when calling {{nickname}}.');
+    }
+
 {{/required}}
 {{/allParams}}
 {{#queryParams}}
-        if ({{paramName}} !== undefined) {
-            queryParameters.set('{{baseName}}', {{paramName}} as any);
-        }
+    if ({{paramName}} !== undefined) {
+      queryParameters.set('{{baseName}}', {{paramName}} as any);
+    }
 
 {{/queryParams}}
-{{#headerParams}}
-            headerParams.set('{{baseName}}', {{paramName}});
+    if (this.config.pid) {
+      queryParameters.set('pid', this.config.pid);
+    }
 
+{{#headerParams}}
+    headerParams.set('{{baseName}}', {{paramName}});
 {{/headerParams}}
 {{#hasFormParams}}
-        headerParams.set('Content-Type', 'application/x-www-form-urlencoded');
+    headerParams.set('Content-Type', 'application/x-www-form-urlencoded');
 
 {{/hasFormParams}}
 {{#formParams}}
-        formParams['{{baseName}}'] = {{paramName}};
+    formParams['{{baseName}}'] = {{paramName}};
 
 {{/formParams}}
-        let requestOptions: RequestOptionsArgs = {
-            method: '{{httpMethod}}',
-            headers: headerParams,
-            search: queryParameters
-        };
-        {{#bodyParam}}
-        requestOptions.body = JSON.stringify({{paramName}});
-        {{/bodyParam}}
-        {{#hasFormParams}}
-        requestOptions.body = formParams.toString();
-        {{/hasFormParams}}
-        const authHeaderString = this.config.authHeaderGetter(String(requestOptions.method), path, requestOptions.body);
+    let requestOptions: RequestOptionsArgs = {
+      method: '{{httpMethod}}',
+      headers: headerParams,
+      search: queryParameters,
+    };
 
-        if (authHeaderString) {
-          requestOptions.headers.set('Authorization', authHeaderString);
+    {{#bodyParam}}
+    requestOptions.body = JSON.stringify({{paramName}});
+    {{/bodyParam}}
+    {{#hasFormParams}}
+    requestOptions.body = formParams.toString();
+    {{/hasFormParams}}
+    const authHeaderString = this.config.authHeaderGetter(String(requestOptions.method), path, requestOptions.body);
+
+    if (authHeaderString) {
+      requestOptions.headers.set('Authorization', authHeaderString);
+    }
+
+    return this.http.request(path, requestOptions)
+      .map((response: Response) => {
+        if (response.status === 204) {
+          return undefined;
+        } else {
+          return response.json();
         }
-
-        return this.http.request(path, requestOptions)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json();
-                }
-            });
+      });
     }
 
 {{/operation}}
