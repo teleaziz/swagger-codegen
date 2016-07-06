@@ -1,7 +1,9 @@
+import { RequestOptions } from '@angular/http';
+
 export interface ApiConfig {
   basePath: string;
   pid?: string;
-  authHeaderGetter: (method: string, uri: string, body: any) => string;
+  requestInterceptor: (path: string, requestOptions: RequestOptions) => void;
 }
 
 export interface Api{{appName}}ConfigMap {

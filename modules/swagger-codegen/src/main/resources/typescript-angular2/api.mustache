@@ -1,5 +1,5 @@
 {{>licenseInfo}}
-import { Http, Headers, RequestOptionsArgs, Response, URLSearchParams } from '@angular/http';
+import { Http, Headers, RequestOptions, Response, URLSearchParams } from '@angular/http';
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as models from '../model/models';
@@ -73,7 +73,7 @@ export class {{classname}} {
     formParams['{{baseName}}'] = {{paramName}};
 
 {{/formParams}}
-    let requestOptions: RequestOptionsArgs = {
+    let requestOptions: RequestOptions = {
       method: '{{httpMethod}}',
       headers: headerParams,
       search: queryParameters,
@@ -85,10 +85,10 @@ export class {{classname}} {
     {{#hasFormParams}}
     requestOptions.body = formParams.toString();
     {{/hasFormParams}}
-    const authHeaderString = this.config.authHeaderGetter(String(requestOptions.method), path, requestOptions.body);
+    const interceptor = this.config.requestInterceptor;
 
-    if (authHeaderString) {
-      requestOptions.headers.set('Authorization', authHeaderString);
+    if (interceptor) {
+      interceptor(path, requestOptions);
     }
 
     return this.http.request(path, requestOptions)
