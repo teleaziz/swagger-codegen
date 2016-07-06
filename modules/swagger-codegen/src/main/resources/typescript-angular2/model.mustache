@@ -10,15 +10,15 @@ import * as models from './models';
  */
 {{/description}}
 export interface {{classname}} {{#parent}}extends models.{{{parent}}} {{/parent}}{
-    {{#additionalPropertiesType}}[key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};{{/additionalPropertiesType}}
+  {{#additionalPropertiesType}}[key: string]: {{{additionalPropertiesType}}}{{#hasVars}} | any{{/hasVars}};{{/additionalPropertiesType}}
 {{#vars}}
 
 {{#description}}
-    /**
-     * {{{description}}}
-     */
+  /**
+   * {{{description}}}
+   */
 {{/description}}
-    {{name}}?: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
+  {{name}}{{^required}}?{{/required}}: {{#isEnum}}{{classname}}.{{{datatypeWithEnum}}}{{/isEnum}}{{^isEnum}}{{{datatype}}}{{/isEnum}};
 {{/vars}}
 }
 {{#hasEnums}}
@@ -26,9 +26,9 @@ export namespace {{classname}} {
 {{#vars}}
 {{#isEnum}}
 
-    export enum {{datatypeWithEnum}} { {{#allowableValues}}{{#values}}
-        {{.}} = <any> '{{.}}',{{/values}}{{/allowableValues}}
-    }
+  export enum {{datatypeWithEnum}} { {{#allowableValues}}{{#values}}
+    {{.}} = <any> '{{.}}',{{/values}}{{/allowableValues}}
+  }
 {{/isEnum}}
 {{/vars}}
 }
