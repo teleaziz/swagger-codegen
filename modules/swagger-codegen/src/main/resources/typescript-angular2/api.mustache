@@ -1,5 +1,5 @@
 {{>licenseInfo}}
-import { Http, Headers, RequestOptions, Response, URLSearchParams } from '@angular/http';
+import { Http, Headers, RequestOptionsArgs, Response, URLSearchParams } from '@angular/http';
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as models from '../model/models';
@@ -73,7 +73,7 @@ export class {{classname}} {
     formParams['{{baseName}}'] = {{paramName}};
 
 {{/formParams}}
-    let requestOptions: RequestOptions = {
+    let requestOptions: RequestOptionsArgs = {
       method: '{{httpMethod}}',
       headers: headerParams,
       search: queryParameters,
