@@ -1,9 +1,9 @@
-import { RequestOptions } from '@angular/http';
+import { RequestOptionsArgs } from '@angular/http';
 
 export interface ApiConfig {
   basePath: string;
   pid?: string;
-  requestInterceptor: (path: string, requestOptions: RequestOptions) => void;
+  requestInterceptor: (path: string, requestOptions: RequestOptionsArgs) => void;
 }
 
 export interface Api{{appName}}ConfigMap {
