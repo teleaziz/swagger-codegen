@@ -41,7 +41,7 @@ export class {{classname}} {
     let queryParameters = new URLSearchParams();
     let headerParams = this.defaultHeaders;
 {{#hasFormParams}}
-    let formParams = new URLSearchParams();
+    let formParams: { [key: string]: string } = {};
 {{/hasFormParams}}
 {{#allParams}}
 {{#required}}
@@ -70,7 +70,9 @@ export class {{classname}} {
 
 {{/hasFormParams}}
 {{#formParams}}
-    formParams['{{baseName}}'] = {{paramName}};
+    if ({{paramName}}) {
+      formParams['{{baseName}}'] = String({{paramName}});
+    }
 
 {{/formParams}}
     let requestOptions: RequestOptionsArgs = {
@@ -83,7 +85,7 @@ export class {{classname}} {
     requestOptions.body = JSON.stringify({{paramName}});
     {{/bodyParam}}
     {{#hasFormParams}}
-    requestOptions.body = formParams.toString();
+    requestOptions.body = JSON.stringify(formParams);
     {{/hasFormParams}}
     const interceptor = this.config.requestInterceptor;
 
