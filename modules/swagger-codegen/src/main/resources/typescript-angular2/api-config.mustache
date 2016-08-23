@@ -1,9 +1,15 @@
 import { RequestOptionsArgs } from '@angular/http';
 
+export interface HTTPCallConfig {
+  path: string;
+  requestOptions: RequestOptionsArgs;
+  className: string;
+}
+
 export interface ApiConfig {
   basePath: string;
   pid?: string;
-  requestInterceptor: (path: string, requestOptions: RequestOptionsArgs) => void;
+  requestInterceptor: (config: HTTPCallConfig) => HTTPCallConfig;
 }
 
 export interface Api{{appName}}ConfigMap {
