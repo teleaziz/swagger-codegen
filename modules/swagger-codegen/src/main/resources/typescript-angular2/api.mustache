@@ -4,7 +4,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import * as models from '../model/models';
 import 'rxjs/add/operator/map';
-import { ApiConfig, Api{{appName}}ConfigMap, HTTPCallConfig } from './api-config';
+import { ApiConfig, Api{{appName}}ConfigMap, HTTPCallConfig, UrlParam } from './api-config';
 
 /* tslint:disable:no-unused-variable member-ordering */
 
@@ -34,7 +34,7 @@ export class {{classname}} {
    {{#notes}}*{{ notes}}{{/notes}}
    {{#allParams}}* @param {{paramName}}{{#description}} {{description}}{{/description}}
    {{/allParams}}*/
-  public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: any ) : Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}> {
+  public {{nickname}} ({{#allParams}}{{paramName}}{{^required}}?{{/required}}: {{{dataType}}}, {{/allParams}}extraHttpRequestParams?: UrlParam[] ) : Observable<{{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{}{{/returnType}}> {
     const path = this.config.basePath + '{{path}}'{{#pathParams}}
       .replace('{' + '{{baseName}}' + '}', String({{paramName}})){{/pathParams}};
 
@@ -60,6 +60,10 @@ export class {{classname}} {
 {{/queryParams}}
     if (this.config.pid) {
       queryParameters.set('pid', this.config.pid);
+    }
+
+    if (extraHttpRequestParams) {
+      extraHttpRequestParams.forEach((param) => queryParameters.set(param.key, param.value));
     }
 
 {{#headerParams}}
