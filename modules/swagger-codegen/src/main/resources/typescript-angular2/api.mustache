@@ -86,7 +86,13 @@ export class {{classname}} {
     };
 
     {{#bodyParam}}
-    requestOptions.body = JSON.stringify({{paramName}});
+    const bodyParams = {{paramName}};
+    if (typeof bodyParams === 'string') {
+      requestOptions.body = bodyParams;
+    } else {
+      requestOptions.body = JSON.stringify(bodyParams);
+    }
+
     {{/bodyParam}}
     {{#hasFormParams}}
     requestOptions.body = JSON.stringify(formParams);
