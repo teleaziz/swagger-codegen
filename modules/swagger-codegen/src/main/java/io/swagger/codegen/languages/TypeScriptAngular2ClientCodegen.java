@@ -2,19 +2,16 @@ package io.swagger.codegen.languages;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
-import io.swagger.codegen.CliOption;
-import io.swagger.codegen.CodegenModel;
-import io.swagger.codegen.CodegenParameter;
-import io.swagger.codegen.SupportingFile;
+import io.swagger.codegen.*;
+import io.swagger.models.Model;
 import io.swagger.models.ModelImpl;
-import io.swagger.models.properties.ArrayProperty;
-import io.swagger.models.properties.BooleanProperty;
-import io.swagger.models.properties.FileProperty;
-import io.swagger.models.properties.MapProperty;
-import io.swagger.models.properties.ObjectProperty;
-import io.swagger.models.properties.Property;
+import io.swagger.models.Operation;
+import io.swagger.models.Response;
+import io.swagger.models.Swagger;
+import io.swagger.models.properties.*;
+import io.swagger.models.parameters.Parameter;
 
 public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCodegen {
     private static final SimpleDateFormat SNAPSHOT_SUFFIX_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
@@ -76,6 +73,30 @@ public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCod
         }
     }
 
+    @Override
+    public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, Map<String, Model> definitions, Swagger swagger) {
+        CodegenOperation op = super.fromOperation(path, httpMethod, operation, definitions, swagger);
+        CodegenParameter exp = generateExtraHttpRequestParam();
+        List<Parameter> parameters = operation.getParameters();
+
+        if (parameters != null) {
+            op.allParams.add(0, exp);
+            Collections.sort(op.allParams, new Comparator<CodegenParameter>() {
+                @Override
+                public int compare(CodegenParameter one, CodegenParameter another) {
+                    boolean oneRequired = one.required == null ? false : one.required;
+                    boolean anotherRequired = another.required == null ? false : another.required;
+                    if (oneRequired == anotherRequired) return 0;
+                    else if (oneRequired) return -1;
+                    else return 1;
+                }
+            });
+            CodegenParameter lastParam = op.allParams.get(op.allParams.size() - 1);
+            lastParam.isLast = true;
+        }
+        return op;
+    }
+
     private void addNpmPackageGeneration() {
         if(additionalProperties.containsKey(NPM_NAME)) {
             this.setNpmName(additionalProperties.get(NPM_NAME).toString());
@@ -93,6 +114,14 @@ public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCod
         if (additionalProperties.containsKey(NPM_REPOSITORY)) {
             this.setNpmRepository(additionalProperties.get(NPM_REPOSITORY).toString());
         }
+    }
+
+    private CodegenParameter generateExtraHttpRequestParam() {
+        CodegenParameter p = CodegenModelFactory.newInstance(CodegenModelType.PARAMETER);
+        p.paramName = "extraHttpRequestParams";
+        p.dataType = "UrlParam[]";
+        p.required = false;
+        return p;
     }
 
     private String getIndexDirectory() {
