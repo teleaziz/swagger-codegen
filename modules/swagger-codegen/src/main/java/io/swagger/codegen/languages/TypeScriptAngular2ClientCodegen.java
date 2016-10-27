@@ -76,7 +76,7 @@ public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCod
     @Override
     public CodegenOperation fromOperation(String path, String httpMethod, Operation operation, Map<String, Model> definitions, Swagger swagger) {
         CodegenOperation op = super.fromOperation(path, httpMethod, operation, definitions, swagger);
-        CodegenParameter exp = generateExtraHttpRequestParam();
+        CodegenParameter exp = generateExtraParams();
         List<Parameter> parameters = operation.getParameters();
 
         if (parameters != null) {
@@ -116,10 +116,10 @@ public class TypeScriptAngular2ClientCodegen extends AbstractTypeScriptClientCod
         }
     }
 
-    private CodegenParameter generateExtraHttpRequestParam() {
+    private CodegenParameter generateExtraParams() {
         CodegenParameter p = CodegenModelFactory.newInstance(CodegenModelType.PARAMETER);
-        p.paramName = "extraHttpRequestParams";
-        p.dataType = "UrlParam[]";
+        p.paramName = "extraParams";
+        p.dataType = "ExtraParams";
         p.required = false;
         return p;
     }

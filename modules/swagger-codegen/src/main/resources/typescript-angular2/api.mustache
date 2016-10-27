@@ -62,8 +62,8 @@ export class {{classname}} {
       queryParameters.set('pid', this.config.pid);
     }
 
-    if (extraHttpRequestParams) {
-      extraHttpRequestParams.forEach((param) => queryParameters.set(param.key, param.value));
+    if (extraParams) {
+      Object.keys(extraParams).forEach((key) => queryParameters.set(key, extraParams[key]));
     }
 
 {{#headerParams}}
