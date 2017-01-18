@@ -108,7 +108,7 @@ export class {{classname}} {
       requestConfig = interceptor(requestConfig);
     }
 
-    return this.http.request(requestConfig.path, requestConfig.requestOptions)
+    const responseObservable = this.http.request(requestConfig.path, requestConfig.requestOptions)
       .map((response: Response) => {
         if (response.status === 204) {
           return undefined;
@@ -116,7 +116,13 @@ export class {{classname}} {
           return response.json();
         }
       });
+
+    if (this.config.responseInterceptor) {
+      return this.config.responseInterceptor(responseObservable);
     }
+
+    return responseObservable;
+  }
 
 {{/operation}}
 }
