@@ -1,4 +1,5 @@
 import { RequestOptionsArgs } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 export interface HTTPCallConfig {
   path: string;
@@ -14,6 +15,7 @@ export interface ApiConfig {
   basePath: string;
   pid?: string;
   requestInterceptor: (config: HTTPCallConfig) => HTTPCallConfig;
+  responseInterceptor?: (responseObservable: Observable) => Observable;
 }
 
 export interface Api{{appName}}ConfigMap {
