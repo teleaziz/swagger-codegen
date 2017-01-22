@@ -15,7 +15,7 @@ export interface ApiConfig {
   basePath: string;
   pid?: string;
   requestInterceptor: (config: HTTPCallConfig) => HTTPCallConfig;
-  responseInterceptor?: (responseObservable: Observable) => Observable;
+  responseInterceptor?: (responseObservable: Observable<any>) => Observable<any>;
 }
 
 export interface Api{{appName}}ConfigMap {

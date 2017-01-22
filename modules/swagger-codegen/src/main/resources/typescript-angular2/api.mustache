@@ -41,7 +41,7 @@ export class {{classname}} {
     let queryParameters = new URLSearchParams();
     let headerParams = this.defaultHeaders;
 {{#hasFormParams}}
-    let formParams: { [key: string]: string } = {};
+    let formParams: { [key: string]: string } = extraParams || {};
 {{/hasFormParams}}
 {{#allParams}}
 {{#required}}
@@ -61,11 +61,13 @@ export class {{classname}} {
     if (this.config.pid) {
       queryParameters.set('pid', this.config.pid);
     }
+{{^hasFormParams}}
 
     if (extraParams) {
       Object.keys(extraParams).forEach((key) => queryParameters.set(key, extraParams[key]));
     }
 
+{{/hasFormParams}}
 {{#headerParams}}
     headerParams.set('{{baseName}}', {{paramName}});
 {{/headerParams}}
